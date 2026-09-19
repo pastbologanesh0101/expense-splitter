@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}{{ group['name'] }} - Expense Splitter{% endblock %}
+{% block content %}
+<h1>{{ group['name'] }}</h1>
+<p><a href="{{ url_for('main.index') }}">&larr; All groups</a></p>
+
+<section class="card">
+  <h2>Members</h2>
+  {% if members %}
+  <ul>
+    {% for m in members %}<li>{{ m['name'] }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p>No members yet.</p>
+  {% endif %}
+  <form method="post" action="{{ url_for('main.add_member', group_id=group['id']) }}">
+    <input type="text" name="name" placeholder="New member name" required>
+    <button type="submit">Add member</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Balances</h2>
+  {% if balances %}
+  <table>
+    <tr><th>Member</th><th>Net balance</th></tr>
+    {% for b in balances %}
+    <tr>
+      <td>{{ b.name }}</td>
+      {% if b.cents > 0 %}
+      <td class="positive">is owed ${{ b.dollars }}</td>
+      {% elif b.cents < 0 %}
+      <td class="negative">owes ${{ b.dollars[1:] }}</td>
+      {% else %}
+      <td>settled up</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>No members yet.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Settlement plan</h2>
+  {% if plan %}
+  <p>Minimum-transaction plan to zero out every balance:</p>
+  <ul class="plan-list">
+    {% for t in plan %}
+    <li>
+      {{ t.from_name }} pays {{ t.to_name }} ${{ t.amount }}
+      <form method="post" action="{{ url_for('main.record_settlement', group_id=group['id']) }}" class="inline-form">
+        <input type="hidden" name="from_member_id" value="{{ t.from_id }}">
+        <input type="hidden" name="to_member_id" value="{{ t.to_id }}">
+        <input type="hidden" name="amount_cents" value="{{ t.amount_cents }}">
+        <button type="submit">Mark as paid</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>All settled up &mdash; no settlements are needed.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Add an expense</h2>
+  {% if members %}
+  <form method="post" action="{{ url_for('main.add_expense', group_id=group['id']) }}">
+    <label>Description <input type="text" name="description" required></label>
+    <label>Amount ($) <input type="text" name="amount" required></label>
+    <label>Paid by
+      <select name="paid_by_member_id" required>
+        {% for m in members %}<option value="{{ m['id'] }}">{{ m['name'] }}</option>{% endfor %}
+      </select>
+    </label>
+    <fieldset>
+      <legend>Split method</legend>
+      <label><input type="radio" name="split_method" value="equal" checked onclick="showSplit('equal')"> Equal</label>
+      <label><input type="radio" name="split_method" value="exact" onclick="showSplit('exact')"> Exact amounts</label>
+      <label><input type="radio" name="split_method" value="percentage" onclick="showSplit('percentage')"> Percentage</label>
+    </fieldset>
+
+    <div id="exact-fields" class="split-fields" style="display:none">
+      {% for m in members %}
+      <label>{{ m['name'] }} exact amount ($)
+        <input type="text" name="exact_{{ m['id'] }}">
+      </label>
+      {% endfor %}
+    </div>
+
+    <div id="percentage-fields" class="split-fields" style="display:none">
+      {% for m in members %}
+      <label>{{ m['name'] }} percentage (%)
+        <input type="text" name="pct_{{ m['id'] }}">
+      </label>
+      {% endfor %}
+    </div>
+
+    <button type="submit">Add expense</button>
+  </form>
+  {% else %}
+  <p>Add at least one member before recording an expense.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Expenses</h2>
+  {% if expenses %}
+  <table>
+    <tr><th>Description</th><th>Amount</th><th>Paid by</th><th>Method</th><th>Shares</th></tr>
+    {% for e in expenses %}
+    <tr>
+      <td>{{ e.description }}</td>
+      <td>${{ e.amount }}</td>
+      <td>{{ e.paid_by }}</td>
+      <td>{{ e.split_method }}</td>
+      <td>{% for s in e.shares %}{{ s.name }}: ${{ s.amount }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p>No expenses yet.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Settlement history</h2>
+  {% if settlements %}
+  <ul>
+    {% for s in settlements %}
+    <li>{{ s.from_name }} paid {{ s.to_name }} ${{ s.amount }}{% if s.completed %} (completed){% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No settlements recorded yet.</p>
+  {% endif %}
+</section>
+
+<script>
+function showSplit(method) {
+  document.getElementById('exact-fields').style.display = method === 'exact' ? 'block' : 'none';
+  document.getElementById('percentage-fields').style.display = method === 'percentage' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

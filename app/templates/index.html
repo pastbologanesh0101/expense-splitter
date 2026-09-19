@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Groups - Expense Splitter{% endblock %}
+{% block content %}
+<h1>Your groups</h1>
+
+<section class="card">
+  <h2>Create a new group</h2>
+  <form method="post" action="{{ url_for('main.create_group') }}">
+    <label>Group name
+      <input type="text" name="name" required>
+    </label>
+    <label>Members (comma-separated)
+      <input type="text" name="members" placeholder="Alice, Bob, Cara">
+    </label>
+    <button type="submit">Create group</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Existing groups</h2>
+  {% if groups %}
+  <ul class="group-list">
+    {% for group in groups %}
+      <li><a href="{{ url_for('main.group_detail', group_id=group['id']) }}">{{ group['name'] }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No groups yet. Create one above.</p>
+  {% endif %}
+</section>
+{% endblock %}

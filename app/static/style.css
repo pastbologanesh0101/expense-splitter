@@ -1,0 +1,174 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  background: #f6f7f9;
+  color: #1f2430;
+}
+
+.site-header {
+  background: #2d6a4f;
+  padding: 1rem 1.5rem;
+}
+
+.site-header .brand {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.site-footer {
+  text-align: center;
+  color: #777;
+  font-size: 0.85rem;
+  padding: 2rem 0;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input[type="text"],
+select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+fieldset {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+fieldset label {
+  display: inline-block;
+  margin-right: 1rem;
+  font-weight: normal;
+}
+
+.split-fields {
+  border-left: 3px solid #2d6a4f;
+  padding-left: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+button {
+  background: #2d6a4f;
+  color: #fff;
+  border: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1b4332;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.positive {
+  color: #2d6a4f;
+  font-weight: 600;
+}
+
+.negative {
+  color: #b3261e;
+  font-weight: 600;
+}
+
+.group-list {
+  list-style: none;
+  padding: 0;
+}
+
+.group-list li {
+  padding: 0.4rem 0;
+}
+
+.plan-list {
+  list-style: none;
+  padding: 0;
+}
+
+.plan-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.inline-form {
+  margin: 0;
+}
+
+.inline-form button {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.flashes {
+  list-style: none;
+  padding: 0;
+}
+
+.flash {
+  padding: 0.6rem 0.9rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.flash-error {
+  background: #fdecea;
+  color: #b3261e;
+  border: 1px solid #f5c2be;
+}
+
+.flash-success {
+  background: #e7f5ec;
+  color: #1b4332;
+  border: 1px solid #b7dfc7;
+}
