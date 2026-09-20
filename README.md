@@ -147,3 +147,34 @@ tests/
   test_app.py         # Flask test-client integration tests
 run.py             # dev server entry point
 ```
+
+## Troubleshooting / FAQ
+
+**My exact/percentage split gets rejected even though the numbers "look
+right" to me.**
+Exact splits must sum to *exactly* the expense's total in cents, and
+percentage splits must sum to *exactly* 100 (within a tiny float
+tolerance). If you typed shares like `33.33 / 33.33 / 33.33` for a
+percentage split, that's `99.99`, not `100` — use `33.33 / 33.33 / 33.34`
+instead, or just use the **Equal** split method, which handles the
+leftover-cent rounding for you automatically.
+
+**The settlement plan suggests a payment I didn't expect.**
+`simplify_debts` doesn't try to preserve "who originally paid whom" — it
+only cares about final net balances, and always matches the current
+largest creditor with the current largest debtor. If two members happen to
+have the same absolute balance, the specific pairing can look different
+from expense to expense even though the total number of payments is still
+minimal.
+
+**Can I record a settlement from a member to themselves?**
+No — `record_settlement` explicitly rejects `from_member_id ==
+to_member_id` with "A member cannot record a settlement paid to
+themselves." to avoid corrupting the group's balance history.
+
+**Why does the app store cents instead of dollars?**
+Storing `amount_cents` as an integer avoids binary floating-point rounding
+errors (e.g. `0.1 + 0.2 != 0.3` in IEEE-754 doubles) that would otherwise
+accumulate across many expenses and eventually leave a settlement plan a
+cent or two off. Dollar strings only exist at the form-input/display
+boundary (`dollars_to_cents` / `cents_to_dollars`).
