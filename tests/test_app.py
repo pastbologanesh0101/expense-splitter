@@ -192,6 +192,30 @@ def test_recording_settlement_updates_balances_to_zero(client, app):
     assert balances[ids["Bob"]] == 0
 
 
+def test_recording_settlement_rejects_paying_self(client, app):
+    create_group_with_members(client, "SelfPay", ["Alice", "Bob"])
+    group_id, ids = get_group_and_member_ids(app, "SelfPay")
+
+    resp = client.post(
+        f"/groups/{group_id}/settlements",
+        data={
+            "from_member_id": str(ids["Alice"]),
+            "to_member_id": str(ids["Alice"]),
+            "amount_cents": "1000",
+        },
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    assert b"cannot record a settlement paid to themselves" in resp.data
+
+    with app.app_context():
+        db = get_db()
+        count = db.execute(
+            "SELECT COUNT(*) AS c FROM settlements WHERE group_id = ?", (group_id,)
+        ).fetchone()["c"]
+    assert count == 0
+
+
 def test_group_page_shows_all_settled_up_when_contributions_are_equal(client, app):
     create_group_with_members(client, "Fair Split", ["Alice", "Bob"])
     group_id, ids = get_group_and_member_ids(app, "Fair Split")

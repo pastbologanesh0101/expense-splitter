@@ -249,6 +249,10 @@ def record_settlement(group_id):
         flash("Invalid settlement.", "error")
         return redirect(url_for("main.group_detail", group_id=group_id))
 
+    if from_id == to_id:
+        flash("A member cannot record a settlement paid to themselves.", "error")
+        return redirect(url_for("main.group_detail", group_id=group_id))
+
     db.execute(
         """INSERT INTO settlements
                (group_id, from_member_id, to_member_id, amount_cents, completed, created_at, completed_at)
