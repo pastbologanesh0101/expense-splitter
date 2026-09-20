@@ -225,3 +225,36 @@ def test_group_page_shows_all_settled_up_when_contributions_are_equal(client, ap
 def test_group_detail_404_for_unknown_group(client):
     resp = client.get("/groups/9999")
     assert resp.status_code == 404
+
+
+def test_create_group_rejects_empty_name(client):
+    resp = client.post(
+        "/groups", data={"name": "", "members": "Alice,Bob"}, follow_redirects=True
+    )
+    assert resp.status_code == 200
+    assert b"Group name is required" in resp.data
+
+
+def test_add_expense_rejects_negative_amount(client, app):
+    create_group_with_members(client, "Negatives", ["Alice", "Bob"])
+    group_id, ids = get_group_and_member_ids(app, "Negatives")
+
+    resp = client.post(
+        f"/groups/{group_id}/expenses",
+        data={
+            "description": "Refund?",
+            "amount": "-20.00",
+            "paid_by_member_id": str(ids["Alice"]),
+            "split_method": "equal",
+        },
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    assert b"Amount must be positive" in resp.data
+
+    with app.app_context():
+        db = get_db()
+        count = db.execute(
+            "SELECT COUNT(*) AS c FROM expenses WHERE group_id = ?", (group_id,)
+        ).fetchone()["c"]
+    assert count == 0
